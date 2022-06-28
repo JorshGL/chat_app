@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import tw from "twrnc";
 
-const register_url = "/"
+const register_url = "/";
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,24}$/;
@@ -25,17 +25,38 @@ const Auth = () => {
   const handleSubmit = async () => {
     // e.preventDefault();
 
-    const v1 = USER_REGEX.test(user);
-    const v2 = PWD_REGEX.test(pass);
+    try {
+      const v1 = USER_REGEX.test(user);
+      const v2 = PWD_REGEX.test(pass);
 
-    const res = await axios.post(
-      register_url,
-      JSON.stringify({ user, pass, matchpass }),
-      {
-        headers: { authorization: "*", "Content-Type": "application/json" },
-        withCredentials: false,
+      if (v1 && v2 === true) {
+        if (pass === matchpass) {
+          const res = await axios.post(
+            register_url,
+            JSON.stringify({ user, pass, matchpass }),
+            {
+              headers: {
+                authorization: "*",
+                "Content-Type": "application/json",
+              },
+              withCredentials: false,
+            }
+          );
+        } else {
+          console.log("Las contras no coinciden");
+        }
+      } else {
+        console.log("Las vainosas no están bien");
       }
-    );
+    } catch (error) {
+      if (!err?.peticion) {
+        setErrorMsg("El servidor no responde");
+      } else if (err.peticion?.status === 418) {
+        setErrorMsg("El usuario ya existe");
+      } else {
+        setErrorMsg("Falló el registro");
+      }
+    }
   };
 
   return (
@@ -82,6 +103,13 @@ const Auth = () => {
               style={tw`border`}
               onChangeText={(newText) => setPass(newText)}
               defaultValue={pass}
+              secureTextEntry={true}
+            />
+            <Text>Confirm Password</Text>
+            <TextInput
+              style={tw`border`}
+              onChangeText={(newText) => setMatchpass(newText)}
+              defaultValue={matchpass}
               secureTextEntry={true}
             />
             <Button onPress={handleSubmit()} title="Register" />
