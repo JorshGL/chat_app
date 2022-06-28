@@ -1,4 +1,4 @@
-from flask import Blueprint, request, abort, g, jsonify, current_app
+from flask import Blueprint, request, abort, jsonify, current_app
 from flask_pymongo import PyMongo
 from werkzeug.security import generate_password_hash, check_password_hash
 
