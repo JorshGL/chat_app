@@ -1,7 +1,6 @@
-from flask import Blueprint, current_app, request, abort, Response, jsonify
+from flask import Blueprint, request, abort, g, jsonify, current_app
 from flask_pymongo import PyMongo
 from werkzeug.security import generate_password_hash, check_password_hash
-
 
 bp = Blueprint(__name__, 'auth', url_prefix='/auth')
 
@@ -14,11 +13,7 @@ def register():
     password = data.get('password')
         
     if not name or not username or not password:
-        response = {
-            'status' : 'error',
-            'message' : "There's no name, no username or no password in request, please, try again."
-        }
-        return Response(jsonify(response), 400)
+        return abort(400)
     
     hashed_pass = generate_password_hash(password)  
     user = {
@@ -32,11 +27,9 @@ def register():
         'status' : 'done',
         'message' : f'user registered as {user}'
     }
-    return Response(jsonify(response), 200)
+    return jsonify(response)
 
-    
-    
-    
+
     
 @bp.route('/login', methods=['POST'])
 def login():

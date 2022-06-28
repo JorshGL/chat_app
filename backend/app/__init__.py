@@ -7,18 +7,8 @@ def create_app():
     app.config.from_object(config)
     import auth
     app.register_blueprint(auth.bp)
-    
-    
-    @app.route('/')
-    def test():
-        storage = PyMongo(app).db.users
-        user = {
-        "name" : "juan",
-        "username" : "equisde",
-        "password" : "ksjadkds"
-        }
-        storage.insert_one(user)
-        return "done"
+    global db
+    db = PyMongo(app).db
     return app
 
 
