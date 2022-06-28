@@ -1,21 +1,12 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import tw from 'twrnc'
+import { NativeRouter, Route, Routes } from "react-router-native";
+import Auth from "./src//app/main/auth/Auth";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text style={tw`text-red-500`}>Hola</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NativeRouter>
+      <Routes>
+        <Route path="/" element={<Auth />} />
+      </Routes>
+    </NativeRouter>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
