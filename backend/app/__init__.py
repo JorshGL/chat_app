@@ -7,7 +7,7 @@ def create_app():
     app.config.from_object(config)
     import auth
     app.register_blueprint(auth.bp)
-    
+    app.config['db'] = PyMongo(app).db
     return app
 
 
