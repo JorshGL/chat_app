@@ -20,7 +20,7 @@ def register():
             "message": "There's no name, username or password provided."
         }), 400, mimetype = 'application/json')
     
-    if storage.find_one({'username' : username}) is not None:
+    if storage.find_one({'user' : username}) is not None:
         return Response(dumps({
             'status' : 'error',
             'message' : 'username already exists'
