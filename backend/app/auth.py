@@ -11,7 +11,7 @@ bp = Blueprint(__name__, 'auth', url_prefix='/auth')
 @cross_origin()
 def register():
     storage = current_app.config['db'].users
-    name, username, password = get_data('name', 'username', 'password')
+    name, username, password = get_data('name', 'user', 'pass')
 
     if not name or not username or not password:
         return Response(dumps({
@@ -28,8 +28,8 @@ def register():
     hashed_pass = generate_password_hash(password)  
     user = {
         'name' : name,
-        'username' : username,
-        'password' : hashed_pass
+        'user' : username,
+        'pass' : hashed_pass
     }
     storage.insert_one(user)
     return Response(dumps({
@@ -42,7 +42,7 @@ def register():
 @cross_origin()
 def login():
     storage = current_app.config['db'].users
-    username, password = get_data('username', 'password')
+    username, password = get_data('user', 'pass')
     
     if not username or not password:
         return Response(dumps({
@@ -50,14 +50,14 @@ def login():
             "message": "There's no username or password provided."
         }), 400, mimetype = 'application/json')
     
-    user = storage.find_one({'username' : username})
+    user = storage.find_one({'user' : username})
     if user is None:
         return Response(dumps({
             "status": "error",
             "message": "User not found"
         }), 404, mimetype = 'application/json')
     
-    if check_password_hash(user.get('password'), password):
+    if check_password_hash(user.get('pass'), password):
         session.clear()
         session['user_id'] = user.get('id')
         return Response(dumps({
