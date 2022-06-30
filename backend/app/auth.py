@@ -2,11 +2,13 @@ from flask import Blueprint, request, current_app, Response, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from json import dumps
+from flask_cors import cross_origin
 
 bp = Blueprint(__name__, 'auth', url_prefix='/auth')
 
 
 @bp.route('/register', methods=['POST'])
+@cross_origin()
 def register():
     storage = current_app.config['db'].users
     name, username, password = get_data('name', 'username', 'password')
@@ -37,6 +39,7 @@ def register():
 
     
 @bp.route('/login', methods=['POST'])
+@cross_origin()
 def login():
     storage = current_app.config['db'].users
     username, password = get_data('username', 'password')
