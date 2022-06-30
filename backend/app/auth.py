@@ -14,6 +14,7 @@ def register():
     name, username, password = get_data('name', 'user', 'pass')
 
     if not name or not username or not password:
+        print(name, username, password)
         return Response(dumps({
             "status": "error",
             "message": "There's no name, username or password provided."
