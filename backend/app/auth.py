@@ -5,7 +5,7 @@ from json import dumps
 
 bp = Blueprint(__name__, 'auth', url_prefix='/auth')
 
-# TODO check if user exists
+
 @bp.route('/register', methods=['POST'])
 def register():
     storage = current_app.config['db'].users
@@ -17,6 +17,12 @@ def register():
             "message": "There's no name, username or password provided."
         }), 400, mimetype = 'application/json')
     
+    if storage.find_one({'username' : username}) is not None:
+        return Response(dumps({
+            'status' : 'error',
+            'message' : 'username already exists'
+        }), 409, mimetype = 'application/json')
+        
     hashed_pass = generate_password_hash(password)  
     user = {
         'name' : name,
