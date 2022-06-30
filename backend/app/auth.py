@@ -54,7 +54,7 @@ def login():
             "message": "User not found"
         }), 404, mimetype = 'application/json')
     
-    if check_password_hash(user.get('password')) == password:
+    if check_password_hash(user.get('password'), password):
         session.clear()
         session['user_id'] = user.get('id')
         return Response(dumps({
@@ -70,7 +70,7 @@ def get_data(*keys):
     return data
 
 
-def loggin_required(func):
+def login_required(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         if 'user_id' not in session:
