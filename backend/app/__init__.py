@@ -5,10 +5,14 @@ def create_app():
     app = Flask(__name__)
     import config
     app.config.from_object(config)
+    app.config['db'] = PyMongo(app).db
+    
     import auth
     app.register_blueprint(auth.bp)
-    global db
-    db = PyMongo(app).db
+    
+    import routes
+    app.register_blueprint(routes.bp)
+    
     return app
 
 
