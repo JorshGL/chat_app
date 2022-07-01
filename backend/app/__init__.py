@@ -12,8 +12,8 @@ def create_app():
     import auth
     app.register_blueprint(auth.bp)
     
-    import routes
-    app.register_blueprint(routes.bp)
+    import users
+    app.register_blueprint(users.bp)
     
     return app
 
