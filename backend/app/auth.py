@@ -67,7 +67,7 @@ def login():
 
 
 def get_data(*keys):
-    json = request.get_json()
+    json = request.get_json(force=True)
     data = []
     for key in keys:
         data.append(json[key])
