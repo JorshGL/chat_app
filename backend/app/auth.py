@@ -35,17 +35,12 @@ def register():
     user = {
         'name' : name,
         'user' : username,
-        'pass' : hashed_pass
+        'pass' : hashed_pass,
+        'chats' : []
     }
     storage.insert_one(user)
     if profile_pic is not None:
-        with Image.open(BytesIO(base64.b64decode(profile_pic))) as img:
-            path = os.path.join(current_app.config['PROFILE_PICS_FOLDER'], user.get('user'))
-            for ext in ['.jpg', '.png']:
-                try: 
-                    img.save(path + ext, optimize=True, quality=70)
-                    break
-                except: continue
+        set_profile_pic(profile_pic, user.get('user'))
     return Response(dumps({
         'status' : 'success',
         'message' : f'user registered as {user}'
@@ -99,3 +94,11 @@ def login_required(func):
     return wrapper
 
 
+def set_profile_pic(profile_pic, username):
+    with Image.open(BytesIO(base64.b64decode(profile_pic))) as img:
+            path = os.path.join(current_app.config['PROFILE_PICS_FOLDER'], username)
+            for ext in ['.jpg', '.png']:
+                try: 
+                    img.save(path + ext, optimize=True, quality=70)
+                    break
+                except: continue
