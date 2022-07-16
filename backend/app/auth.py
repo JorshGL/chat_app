@@ -3,6 +3,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from json import dumps
 from flask_cors import cross_origin
+import os
+from PIL import Image
+import base64
+from io import BytesIO
+
 
 bp = Blueprint(__name__, 'auth', url_prefix='/auth')
 
@@ -11,7 +16,7 @@ bp = Blueprint(__name__, 'auth', url_prefix='/auth')
 @cross_origin()
 def register():
     storage = current_app.config['db'].users
-    name, username, password = get_data('name', 'user', 'pass')
+    name, username, password, profile_pic = get_data('name', 'user', 'pass', 'profile_pic')
 
     if not name or not username or not password:
         print(name, username, password)
@@ -30,9 +35,12 @@ def register():
     user = {
         'name' : name,
         'user' : username,
-        'pass' : hashed_pass
+        'pass' : hashed_pass,
+        'chats' : []
     }
     storage.insert_one(user)
+    if profile_pic is not None:
+        set_profile_pic(profile_pic, user.get('user'))
     return Response(dumps({
         'status' : 'success',
         'message' : f'user registered as {user}'
@@ -67,7 +75,7 @@ def login():
 
 
 def get_data(*keys):
-    json = request.get_json()
+    json = request.get_json(force=True)
     data = []
     for key in keys:
         data.append(json[key])
@@ -86,3 +94,11 @@ def login_required(func):
     return wrapper
 
 
+def set_profile_pic(profile_pic, username):
+    with Image.open(BytesIO(base64.b64decode(profile_pic))) as img:
+            path = os.path.join(current_app.config['PROFILE_PICS_FOLDER'], username)
+            for ext in ['.jpg', '.png']:
+                try: 
+                    img.save(path + ext, optimize=True, quality=70)
+                    break
+                except: continue
