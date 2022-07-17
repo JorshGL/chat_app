@@ -1,4 +1,4 @@
-from flask import Blueprint, request, current_app, Response, session
+from flask import Blueprint, request, current_app, Response, session, g
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from json import dumps
@@ -36,11 +36,10 @@ def register():
         'name' : name,
         'user' : username,
         'pass' : hashed_pass,
+        'profile_pic' : profile_pic,
         'chats' : []
     }
     storage.insert_one(user)
-    if profile_pic is not None:
-        set_profile_pic(profile_pic, user.get('user'))
     return Response(dumps({
         'status' : 'success',
         'message' : f'user registered as {user}'
@@ -68,7 +67,7 @@ def login():
     
     if check_password_hash(user.get('pass'), password):
         session.clear()
-        session['user_id'] = user.get('id')
+        session['user_id'] = user.get('_id').__str__()
         return Response(dumps({
             "status": "success"
         }), 200, mimetype = 'application/json')
@@ -94,11 +93,11 @@ def login_required(func):
     return wrapper
 
 
-def set_profile_pic(profile_pic, username):
-    with Image.open(BytesIO(base64.b64decode(profile_pic))) as img:
-            path = os.path.join(current_app.config['PROFILE_PICS_FOLDER'], username)
-            for ext in ['.jpg', '.png']:
-                try: 
-                    img.save(path + ext, optimize=True, quality=70)
-                    break
-                except: continue
+# def set_profile_pic(profile_pic, username):
+#     with Image.open(BytesIO(base64.b64decode(profile_pic))) as img:
+#             path = os.path.join(current_app.config['PROFILE_PICS_FOLDER'], username)
+#             for ext in ['.jpg', '.png']:
+#                 try: 
+#                     img.save(path + ext, optimize=True, quality=70)
+#                     break
+#                 except: continue
