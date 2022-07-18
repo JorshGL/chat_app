@@ -33,9 +33,12 @@ async def handle_connection(ws, username):
 
 
 async def handle_disconnection(ws, username):
-    USERS[username].remove(ws)
+    if len(USERS[username]) == 1:
+        USERS.pop(username, None)
+    else:
+        USERS[username].remove(ws)
     
-    print(f'device {ws} from user {username} has been disconnected, actual devices: {len(USERS[username])}')
+    print(f'device {ws} from user {username} has been disconnected, actual devices: {len(USERS[username]) if username in USERS else 0}')
     return
 
 
