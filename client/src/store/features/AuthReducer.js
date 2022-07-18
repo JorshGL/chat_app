@@ -1,0 +1,33 @@
+import { createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
+import api from "../../constants/api";
+
+export const createLogin = (body) => async (dispatch) => {
+  try {
+    const URL = `${api.baseUrl}/${api.endpoints.auth}`;
+    const res = await axios.post(URL, body);
+    return res;
+  } catch (err) {
+    console.log("*** REDUX -> createLogin ***", err);
+    await dispatch();
+    return false;
+  }
+};
+
+export const AuthSlice = createSlice({
+  name: "auth",
+  initialState: {
+    profile: [],
+  },
+  reducers: {
+    SET_PROFILE: (state, action) => {
+      state.profile = action.payload;
+    },
+  },
+});
+
+export const { SET_PROFILE } = AuthSlice.actions
+
+export const selectProfile = (state) => state.auth.profile
+
+export default AuthSlice.reducer
