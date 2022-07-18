@@ -2,44 +2,66 @@ import websockets as ws, asyncio, json
 
 
 USERS = {
-    # socket : username
+    # username : websocket
 }
 
 
-async def register(username, websocket): 
-    USERS[websocket] = username
-    response = {
+# async def register(username, websocket): 
+#     USERS[websocket] = username
+#     response = {
+#         "type" : "response",
+#         "code" : 1,
+#         "message" : "connected",
+#         "users_connected" : len(USERS)
+#     }
+#     return response
+
+
+async def handle_connection(ws, username):
+    if username not in USERS:
+        USERS[username] = [ws]
+    
+    elif ws not in USERS[username]:
+        USERS[username].append(ws)
+    
+    print(f'user {username} connected from {ws}, actual devices: {len(USERS[username])}')
+    return {
         "type" : "response",
-        "code" : 1,
         "message" : "connected",
-        "users_connected" : len(USERS)
+        "devices" : len(USERS[username])
     }
-    return response
 
 
-async def send_messages(websocket, message):
-    for address in USERS.keys():
-        if address == websocket:
-            continue
-        event = {
-            "type": "message",
-            "message": message
-        }
-        await address.send(json.dumps(event))
+async def handle_disconnection(ws, username):
+    USERS[username].remove(ws)
+    
+    print(f'device {ws} from user {username} has been disconnected, actual devices: {len(USERS[username])}')
+    return
+
+
+# async def send_messages(websocket, message):
+#     for address in USERS.keys():
+#         if address == websocket:
+#             continue
+#         event = {
+#             "type": "message",
+#             "message": message
+#         }
+#         await address.send(json.dumps(event))
         
 
-async def handler(websocket):
-    async for event in websocket:
+async def handler(ws):
+    async for event in ws:
         event = json.loads(event)
         
         if event.get('type') == "connection":
             username = event.get('username')       
-            response = await register(websocket, username)
-            await websocket.send(json.dumps(response))
+            response = await handle_connection(ws, username)
+            await ws.send(json.dumps(response))
             
-        elif event.get('type') == "message":
-            message = event.get('message')
-            await send_messages(websocket, message)
+        elif event.get('type') == "disconnection":
+            username = event.get('username') 
+            await handle_disconnection(ws, username)
 
 
 async def main():
