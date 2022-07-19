@@ -1,16 +1,17 @@
 from auth import login_required, get_data
 from flask import Blueprint, current_app, Response, session, request
 from bson import json_util, ObjectId
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import re
 from json import dumps
 
 
 bp = Blueprint(__name__, 'users', url_prefix='/users')
-CORS(bp, support_credentials=True)
+CORS(bp, support_credentials=True, expose_headers=['Access-Control-Allow-Credentials', 'Authorization'])
 
 @bp.route('/all')
-@login_required
+# @login_required
+@cross_origin()
 def get_users():
     storage = current_app.config['db'].users
     result = storage.find({}, {'user' : 1, '_id' : 0})
