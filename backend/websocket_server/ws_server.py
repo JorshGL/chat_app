@@ -42,6 +42,8 @@ async def handle_disconnection(ws, username):
     return
 
 
+async def handle_messages(ws, event):
+    pass
 # async def send_messages(websocket, message):
 #     for address in USERS.keys():
 #         if address == websocket:
@@ -65,6 +67,9 @@ async def handler(ws):
         elif event.get('type') == "disconnection":
             username = event.get('username') 
             await handle_disconnection(ws, username)
+            
+        elif event.get('type') == "message":
+            await handle_messages(ws, event)
 
 
 async def main():
