@@ -30,6 +30,8 @@ const Auth = () => {
 
   const [session, setSession] = useState(useSelector(selectLogged))
 
+  console.log(session)
+
   // useEffect(() => {
 
   //   if(session === false){
