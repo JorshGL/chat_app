@@ -29,7 +29,7 @@ def get_user(user):
 
 
 @bp.route('/search/<user>')
-@login_required
+# @login_required
 def search(user):
     users_finded = []
     storage = current_app.config['db'].users
