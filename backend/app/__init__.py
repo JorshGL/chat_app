@@ -6,7 +6,7 @@ import os
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, support_credentials=True)
     import config
     app.config.from_object(config)
     app.config['db'] = PyMongo(app).db

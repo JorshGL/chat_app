@@ -2,7 +2,7 @@ from flask import Blueprint, request, current_app, Response, session, g
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from json import dumps
-from flask_cors import cross_origin
+from flask_cors import CORS
 import os
 from PIL import Image
 import base64
@@ -10,10 +10,9 @@ from io import BytesIO
 
 
 bp = Blueprint(__name__, 'auth', url_prefix='/auth')
-
+CORS(bp, supports_credentials=True)
 
 @bp.route('/register', methods=['POST'])
-@cross_origin()
 def register():
     storage = current_app.config['db'].users
     name, username, password, profile_pic = get_data('name', 'user', 'pass', 'profile_pic')
@@ -47,7 +46,6 @@ def register():
 
     
 @bp.route('/login', methods=['POST'])
-@cross_origin()
 def login():
     storage = current_app.config['db'].users
     username, password = get_data('user', 'pass')

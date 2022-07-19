@@ -1,17 +1,16 @@
 from auth import login_required, get_data
 from flask import Blueprint, current_app, Response, session, request
 from bson import json_util, ObjectId
-from flask_cors import cross_origin
+from flask_cors import CORS
 import re
 from json import dumps
 
 
 bp = Blueprint(__name__, 'users', url_prefix='/users')
-
+CORS(bp, support_credentials=True)
 
 @bp.route('/all')
 @login_required
-@cross_origin()
 def get_users():
     storage = current_app.config['db'].users
     result = storage.find({}, {'user' : 1, '_id' : 0})
@@ -21,7 +20,6 @@ def get_users():
 
 @bp.route('/<user>')
 @login_required
-@cross_origin()
 def get_user(user):
     storage = current_app.config['db'].users
     result = storage.find_one({'user': user})
@@ -31,7 +29,6 @@ def get_user(user):
 
 @bp.route('/search/<user>')
 @login_required
-@cross_origin()
 def search(user):
     users_finded = []
     storage = current_app.config['db'].users
@@ -44,7 +41,6 @@ def search(user):
 
 @bp.route('/me', methods=['GET', 'PATCH'])
 @login_required
-@cross_origin()
 def account():
     user_id = ObjectId(session.get('user_id'))
     print(user_id)
