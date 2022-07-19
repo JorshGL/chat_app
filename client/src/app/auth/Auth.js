@@ -30,13 +30,15 @@ const Auth = () => {
 
   const [session, setSession] = useState(useSelector(selectLogged))
 
-  useEffect(() => {
-    if(session === false){
-      navigate('/auth')
-    }else{
-      navigate('/')
-    }
-  },[])
+  // useEffect(() => {
+
+  //   if(session === false){
+  //     navigate('/auth')
+  //   }else{
+  //     navigate('/')
+  //   }
+  // },[session])
+  
 
   const handleRegister = async () => {
     // e.preventDefault();
@@ -112,7 +114,7 @@ const Auth = () => {
                 <h1 className="text-gray-200">
                   You are not registered yet?{" "}
                   <button
-                    className="text-yellow-400"
+                    className="text-yellow-400 font-semibold"
                     onClick={() => setModal(true)}
                   >
                     Register

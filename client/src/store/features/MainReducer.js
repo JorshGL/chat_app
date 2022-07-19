@@ -1,13 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-export const createSession = () => async (dispatch) => {
-  await dispatch(SET_LOGGED(true))
-};
+import axios from "axios";
+import api from "../../constants/api";
 
 export const MainSlice = createSlice({
   name: "main",
   initialState: {
-    logged: false,
+    logged: true,
   },
   reducers: {
     SET_LOGGED: (state, action) => {
@@ -16,8 +14,8 @@ export const MainSlice = createSlice({
   },
 });
 
-export const { SET_LOGGED } = MainSlice.actions
+export const { SET_LOGGED } = MainSlice.actions;
 
-export const selectLogged = (state) => state.main.logged
+export const selectLogged = (state) => state.main.logged;
 
-export default MainSlice.reducer
+export default MainSlice.reducer;
