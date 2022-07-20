@@ -1,11 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import api from "../../constants/api";
+
 
 export const MainSlice = createSlice({
   name: "main",
   initialState: {
-    logged: true,
+    logged: false,
   },
   reducers: {
     SET_LOGGED: (state, action) => {
@@ -14,8 +13,8 @@ export const MainSlice = createSlice({
   },
 });
 
-export const { SET_LOGGED } = MainSlice.actions;
-
 export const selectLogged = (state) => state.main.logged;
+
+export const { SET_LOGGED } = MainSlice.actions;
 
 export default MainSlice.reducer;

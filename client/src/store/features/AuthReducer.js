@@ -6,8 +6,8 @@ import { SET_LOGGED } from "./MainReducer";
 export const createLogin = (body) => async (dispatch) => {
   try {
     const URL = `${api.baseUrl}/${api.endpoints.auth}/login`;
-    const res = await axios.post(URL, body);
-    dispatch(SET_LOGGED("Logged"))
+    const res = await axios.post(URL, body, {withCredentials: true});
+    await dispatch(SET_LOGGED(true))
     return res;
   } catch (err) {
     console.log("*** REDUX -> createLogin ***", err);
@@ -20,7 +20,7 @@ export const createProfile = (body) => async (dispatch) => {
   try {
     const URL = `${api.baseUrl}/${api.endpoints.auth}/register`;
     const res = await axios.post(URL, body);
-    dispatch(SET_LOGGED("Logged"))
+    await dispatch(SET_LOGGED(true))
     return res;
   } catch (err) {
     console.log("*** REDUX -> createProfile ***", err);
