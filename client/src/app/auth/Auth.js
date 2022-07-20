@@ -82,6 +82,8 @@ const Auth = () => {
     };
   };
 
+  console.log(profilePic)
+
   return (
     <>
       <div className="grid grid-cols-2 h-screen bg-main">
