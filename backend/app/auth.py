@@ -93,6 +93,7 @@ def write_jwt(user_id):
     return jwt.encode('UTF-8')
 
 
+
 # def set_profile_pic(profile_pic, username):
 #     with Image.open(BytesIO(base64.b64decode(profile_pic))) as img:
 #             path = os.path.join(current_app.config['PROFILE_PICS_FOLDER'], username)

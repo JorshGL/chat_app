@@ -7,7 +7,7 @@ from json import dumps
 
 
 bp = Blueprint(__name__, 'users', url_prefix='/users')
-CORS(bp, support_credentials=True, expose_headers=['Access-Control-Allow-Credentials', 'Authorization'])
+CORS(bp)
 
 @bp.route('/all')
 # @login_required

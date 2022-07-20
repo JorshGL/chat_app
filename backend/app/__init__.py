@@ -6,7 +6,7 @@ import os
 
 def create_app():
     app = Flask(__name__)
-    CORS(app, support_credentials=True)
+    CORS(app)
     import config
     app.config.from_object(config)
     app.config['db'] = PyMongo(app).db
@@ -21,7 +21,7 @@ def create_app():
     
     import users
     app.register_blueprint(users.bp)
-    
+            
     return app
 
 
