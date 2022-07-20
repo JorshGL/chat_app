@@ -10,11 +10,7 @@ def create_app():
     import config
     app.config.from_object(config)
     app.config['db'] = PyMongo(app).db
-    
-    if not os.path.exists(app.config['UPLOADS_FOLDER']):
-        os.mkdir(app.config['UPLOADS_FOLDER'])
-    if not os.path.exists(app.config['PROFILE_PICS_FOLDER']):
-        os.mkdir(app.config['PROFILE_PICS_FOLDER'])
+
     
     import auth
     app.register_blueprint(auth.bp)

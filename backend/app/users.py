@@ -1,4 +1,4 @@
-from auth import login_required, get_data
+from auth import get_data
 from flask import Blueprint, current_app, Response, session, request
 from bson import json_util, ObjectId
 from flask_cors import CORS, cross_origin
@@ -10,7 +10,7 @@ bp = Blueprint(__name__, 'users', url_prefix='/users')
 CORS(bp)
 
 @bp.route('/all')
-# @login_required
+#
 @cross_origin()
 def get_users():
     storage = current_app.config['db'].users
@@ -20,7 +20,7 @@ def get_users():
 
 
 @bp.route('/<user>')
-@login_required
+
 def get_user(user):
     storage = current_app.config['db'].users
     result = storage.find_one({'user': user})
@@ -29,7 +29,7 @@ def get_user(user):
 
 
 @bp.route('/search/<user>')
-# @login_required
+# 
 def search(user):
     users_finded = []
     storage = current_app.config['db'].users
@@ -41,7 +41,7 @@ def search(user):
 
 
 @bp.route('/me', methods=['GET', 'PATCH'])
-@login_required
+
 def account():
     user_id = ObjectId(session.get('user_id'))
     print(user_id)
