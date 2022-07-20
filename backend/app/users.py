@@ -1,4 +1,4 @@
-from auth import get_data
+from auth import get_data, validate_jwt
 from flask import Blueprint, current_app, Response, session, request
 from bson import json_util, ObjectId
 from flask_cors import CORS, cross_origin
@@ -10,9 +10,8 @@ bp = Blueprint(__name__, 'users', url_prefix='/users')
 CORS(bp)
 
 @bp.route('/all')
-#
-@cross_origin()
-def get_users():
+@validate_jwt
+def get_users(payload):
     storage = current_app.config['db'].users
     result = storage.find({}, {'user' : 1, '_id' : 0})
     users = json_util.dumps(result, indent=2)
@@ -20,8 +19,8 @@ def get_users():
 
 
 @bp.route('/<user>')
-
-def get_user(user):
+@validate_jwt
+def get_user(payload, user):
     storage = current_app.config['db'].users
     result = storage.find_one({'user': user})
     json_user = json_util.dumps(result, indent=2)
@@ -29,8 +28,8 @@ def get_user(user):
 
 
 @bp.route('/search/<user>')
-# 
-def search(user):
+@validate_jwt
+def search(payload, user):
     users_finded = []
     storage = current_app.config['db'].users
     results = storage.find({}, {'user': 1, '_id': 0})
@@ -41,15 +40,13 @@ def search(user):
 
 
 @bp.route('/me', methods=['GET', 'PATCH'])
-
-def account():
-    user_id = ObjectId(session.get('user_id'))
-    print(user_id)
+@validate_jwt
+def account(payload):
+    user_id = ObjectId(payload.get('user_id'))
     storage = current_app.config['db'].users
     
     if request.method == 'GET':
         user = storage.find_one({'_id' : user_id})
-        print(user)
         return Response(json_util.dumps(user), 
                         200, mimetype='application/json')
     

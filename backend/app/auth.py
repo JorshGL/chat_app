@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from json import dumps
 from flask_cors import CORS
-from jwt import encode, decode
+from jwt import encode, decode, exceptions
 import os
 
 bp = Blueprint(__name__, 'auth', url_prefix='/auth')
@@ -61,11 +61,8 @@ def login():
         }), 404, mimetype = 'application/json')
     
     if check_password_hash(user.get('pass'), password):
-        session.clear()
-        session['user_id'] = user.get('_id').__str__()
-        return Response(dumps({
-            "status": "success"
-        }), 200, mimetype = 'application/json')
+        token = write_jwt(user.get('_id').__str__())
+        return Response(token, 200)
 
 
 def get_data(*keys):
@@ -76,21 +73,49 @@ def get_data(*keys):
     return data
 
 
-def login_required(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if 'user_id' not in session:
-            return Response(dumps({
-                "status": "error",
-                "message": "You must be logged in to access this page."
-            }), 401, mimetype = 'application/json')
-        return func(*args, **kwargs)
-    return wrapper
+# def login_required(func):
+#     @wraps(func)
+#     def wrapper(*args, **kwargs):
+#         if 'user_id' not in session:
+#             return Response(dumps({
+#                 "status": "error",
+#                 "message": "You must be logged in to access this page."
+#             }), 401, mimetype = 'application/json')
+#         return func(*args, **kwargs)
+#     return wrapper
 
 
 def write_jwt(user_id):
-    jwt = encode(payload={ "user_id": user_id }, key=os.getenv('SECRET_KEY'), algorithm='HS256')
-    return jwt.encode('UTF-8')
+    token = encode(payload={ "user_id": user_id }, key=os.getenv('SECRET_KEY'), algorithm='HS256')
+    return token.encode('UTF-8')
+
+
+def validate_jwt(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            header = request.headers.get('Authorization')
+            if header is None:
+                raise KeyError
+            token = header.split(" ")[1]
+            payload = decode(token, key=os.getenv('SECRET_KEY'), algorithms=['HS256'])
+            return func(payload, *args, **kwargs)
+        
+        except KeyError:
+            return Response(dumps({
+                "status": "error",
+                "message": "There's no Authorization header in the request."
+            }), 400, mimetype = 'application/json')
+            
+        except exceptions.DecodeError as e:
+            print(e)
+            return Response(dumps({
+                "status": "error",
+                "message": "Invalid token"
+            }), 400, mimetype = 'application/json')
+            
+    return wrapper
+        
 
 
 
