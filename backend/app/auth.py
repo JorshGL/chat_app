@@ -3,14 +3,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from json import dumps
 from flask_cors import CORS
+from jwt import encode, decode
 import os
-from PIL import Image
-import base64
-from io import BytesIO
-
 
 bp = Blueprint(__name__, 'auth', url_prefix='/auth')
-CORS(bp, supports_credentials=True)
+CORS(bp)
 
 @bp.route('/register', methods=['POST'])
 def register():
@@ -89,6 +86,11 @@ def login_required(func):
             }), 401, mimetype = 'application/json')
         return func(*args, **kwargs)
     return wrapper
+
+
+def write_jwt(user_id):
+    jwt = encode(payload={ "user_id": user_id }, key=os.getenv('SECRET_KEY'), algorithm='HS256')
+    return jwt.encode('UTF-8')
 
 
 # def set_profile_pic(profile_pic, username):
