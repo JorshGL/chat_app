@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createLogin } from "../../store/features/AuthReducer";
+import { createLogin, getLogged,  } from "../../store/features/AuthReducer";
 import image from "../../assets/bg.webp";
 import { Modal } from "react-bootstrap";
 import { createProfile } from "../../store/features/AuthReducer";
 import styles from "./auth.css";
-import { CameraAlt, Close } from "@mui/icons-material";
-import { createSession, selectLogged } from "../../store/features/MainReducer";
+import { CameraAlt, Close, VerifiedUser } from "@mui/icons-material";
 import { useNavigate } from "react-router";
+import isEmpty from "lodash/isEmpty";
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,24}$/;
 
 const Auth = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
+  const logged = useSelector((state) => state.auth.logged);
+  const [session, setSession] = useState();
   const [name, setName] = useState("");
   const [userRegister, setUserRegister] = useState("");
   const [passRegister, setPassRegister] = useState("");
@@ -28,23 +30,17 @@ const Auth = () => {
 
   const [modal, setModal] = useState(false);
 
-  const [session, setSession] = useState(useSelector(selectLogged))
+  useEffect(() => {
+    setSession(logged);
+  }, [session]);
 
-  console.log(session)
-
-  // useEffect(() => {
-
-  //   if(session === false){
-  //     navigate('/auth')
-  //   }else{
-  //     navigate('/')
-  //   }
-  // },[session])
-  
+  useEffect(() => {
+    if (session) {
+      navigate("/");
+    }
+  }, [session]);
 
   const handleRegister = async () => {
-    // e.preventDefault();
-
     const v1 = USER_REGEX.test(userRegister);
     const v2 = PWD_REGEX.test(passRegister);
 
@@ -70,7 +66,8 @@ const Auth = () => {
       user: user,
       pass: pass,
     };
-    await dispatch(createLogin(body));
+    const res = await dispatch(createLogin(body));
+    await dispatch(getLogged())
   };
 
   const getBase64 = (file) => {
@@ -82,7 +79,8 @@ const Auth = () => {
     };
   };
 
-  console.log(profilePic)
+  
+console.log(session)
 
   return (
     <>
@@ -162,9 +160,19 @@ const Auth = () => {
             onChange={(e) => setMatchpass(e.target.value)}
             className="my-3 bg-transparent border text-gray-200 border-gray-500 p-2 outline-none rounded-lg w-full focus:border-yellow-400"
           />
-          <label htmlFor="picture" className="text-gray-200 border-yellow-400  w-full text-center cursor-pointer p-2 rounded-lg">
-            Select Image
-            <CameraAlt className="ml-2" />
+          <label
+            htmlFor="picture"
+            className="text-gray-200 border-yellow-400  w-full text-center cursor-pointer p-2 rounded-lg"
+          >
+            {isEmpty(profilePic) ? (
+              <div className="w-20 h-20 bg-neutral-800">
+                <VerifiedUser />
+              </div>
+            ) : (
+              <div className="w-20 h-20">
+                <img src={profilePic} className="object-cover h-full" />
+              </div>
+            )}
             <input
               type="file"
               onChange={(e) => getBase64(e.target.files)}

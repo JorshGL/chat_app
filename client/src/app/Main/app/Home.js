@@ -1,28 +1,39 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-import { getSearch, selectLogged } from "../../../store/features/MainReducer";
 import bg from "../../../assets/bg.webp";
 import axios from "axios";
 import api from "../../../constants/api";
 import { Add } from "@mui/icons-material";
+import {  selectToken } from "../../../store/features/AuthReducer";
+import { getDataProfile } from "../../../store/features/MainReducer";
 
 const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [session, setSession] = useState(useSelector(selectLogged));
+  const logged = useSelector((state) => state.auth.logged);
+
+  const [session, setSession] = useState("");
+  const [token, setToken] = useState(useSelector(selectToken));
   const [searched, setSearched] = useState([""]);
   const [id, setId] = useState("");
   const [typing, setTyping] = useState(false);
 
-  // useEffect(() => {
-  //   if (session === false) {
-  //     navigate("/auth");
-  //   } else {
-  //     navigate("/");
-  //   }
-  // }, []);
+  console.log(token);
+
+  useEffect(() => {
+    setSession(logged);
+    dispatch(getDataProfile(token));
+  }, [token]);
+
+  useEffect(() => {
+    if (session === false) {
+      navigate("/auth");
+    } else {
+      navigate("/");
+    }
+  }, []);
 
   let typingTimer;
 
@@ -38,7 +49,7 @@ const Home = () => {
 
   const getSearch = async () => {
     const URL = `${api.baseUrl}/${api.endpoints.users}/search/@${id}`;
-    const res = await axios.get(URL);
+    const res = await axios.get(URL, { auth: token });
     if (id !== "") {
       try {
         return setSearched(res.data);
@@ -54,8 +65,8 @@ const Home = () => {
     setSearched([""]);
   };
 
-  console.log(session);
-  console.log(searched);
+  // console.log(session);
+  // console.log(searched);
 
   return (
     <div className="bg-main h-screen grid grid-cols-3">

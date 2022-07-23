@@ -1,14 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import api from "../../constants/api";
-import { SET_LOGGED } from "./MainReducer";
+
 
 export const createLogin = (body) => async (dispatch) => {
   try {
     const URL = `${api.baseUrl}/${api.endpoints.auth}/login`;
-    const res = await axios.post(URL, body, {withCredentials: true});
+    const res = await axios.post(URL, body).then((res) => dispatch(SET_TOKEN(res.data)));
     await dispatch(SET_LOGGED(true))
-    return res;
+    return res
   } catch (err) {
     console.log("*** REDUX -> createLogin ***", err);
     await dispatch();
@@ -16,11 +16,20 @@ export const createLogin = (body) => async (dispatch) => {
   }
 };
 
+export const getLogged = (state) => {
+  const selectLogged = (state) => state.auth.logged;
+  return selectLogged
+}
+
 export const createProfile = (body) => async (dispatch) => {
   try {
     const URL = `${api.baseUrl}/${api.endpoints.auth}/register`;
     const res = await axios.post(URL, body);
-    await dispatch(SET_LOGGED(true))
+    const body2 = {
+      user: body.user,
+      pass: body.pass,
+    };
+    createLogin(body2);
     return res;
   } catch (err) {
     console.log("*** REDUX -> createProfile ***", err);
@@ -32,17 +41,21 @@ export const createProfile = (body) => async (dispatch) => {
 export const AuthSlice = createSlice({
   name: "auth",
   initialState: {
-    profile: [],
+    token: "",
+    logged: false,
   },
   reducers: {
-    SET_PROFILE: (state, action) => {
-      state.profile = action.payload;
+    SET_TOKEN: (state, action) => {
+      state.token = action.payload;
+    },
+    SET_LOGGED: (state, action) => {
+      state.logged = action.payload;
     },
   },
 });
 
-export const { SET_PROFILE } = AuthSlice.actions;
+export const { SET_TOKEN, SET_LOGGED } = AuthSlice.actions;
 
-export const selectProfile = (state) => state.auth.profile;
+export const selectToken = (state) => state.auth.token;
 
 export default AuthSlice.reducer;
