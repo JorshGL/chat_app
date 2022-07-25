@@ -94,9 +94,7 @@ def validate_jwt(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            header = request.headers.get('Authorization')
-            if header is None:
-                raise KeyError
+            header = request.headers['Authorization']
             token = header.split(" ")[1]
             payload = decode(token, key=os.getenv('SECRET_KEY'), algorithms=['HS256'])
             return func(payload, *args, **kwargs)
